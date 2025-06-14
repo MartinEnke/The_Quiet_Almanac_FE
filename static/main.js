@@ -11,9 +11,7 @@ let postToEditId = null;
    UTILITIES: BASE URL (public v1 API)
    ========================================================================== */
 function getDefaultBaseUrl() {
-  return window.location.hostname === "localhost"
-    ? "http://localhost:5021/api/v1"
-    : "https://your-production-backend-url.com/api/v1";
+  return "https://the-quiet-almanac.onrender.com/api/v2";  // ✅ use your live Render backend URL
 }
 
 function getBaseUrl() {
