@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Quiet Almanac</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="banner">
+    <img src="static/images/almanac.png" alt="Notes on the Miraculous Ordinary">
+  </header>
+
+  <main class="container">
+    <!-- 🔧 Top Bar -->
+    <section class="top-bar">
+       <input
+      type="text"
+      id="api-base-url"
+      class="styled-input"
+      placeholder="https://your‐host:port/api/v2"
+      onchange="storeBaseUrl()"
+      value=""
+     >
+      <span class="text-button large" onclick="loadPosts()">Load Posts</span>
+      <div class="top-bar-right">
+        <div id="user-info" class="user-info-pill">Welcome!</div>
+        <span class="text-button large" id="auth-button" onclick="handleAuthClick()">Login</span>
+        <span class="text-button large" onclick="openSignupModal()">Signup</span>
+      </div>
+    </section>
+
+    <!-- 🧩 Filters -->
+    <section class="filter-bar">
+      <select id="filter-category"><option value="">All Categories</option></select>
+      <select id="sort-field">
+        <option value="">No Sorting</option>
+        <option value="author">Author</option>
+        <option value="title">Title</option>
+        <option value="likes">Likes</option>
+        <option value="date">Date</option>
+        <option value="updated">Last Updated</option>
+      </select>
+      <select id="sort-direction">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+      <span class="text-button" onclick="loadPosts()">Apply Filters</span>
+      <span class="text-button" onclick="openAddModal()">Add Post</span>
+      <input type="text" id="search-input" placeholder="Search author, title or content...">
+    </section>
+
+    <!-- 📬 Posts Container -->
+    <section id="post-container"></section>
+  </main>
+
+  <!-- 🔧 Modals -->
+  <div id="update-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>✏️ Edit Post</h2>
+      <input type="text" id="edit-title" placeholder="Title">
+      <textarea id="edit-content" placeholder="Content"></textarea>
+      <select id="edit-category"></select>
+      <div class="modal-buttons">
+        <span class="text-button" onclick="submitUpdate()">Save</span>
+        <span class="text-button" onclick="closeModal()">Cancel</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="add-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>📝 Add Post</h2>
+      <input type="text" id="add-title" placeholder="Title">
+      <textarea id="add-content" placeholder="Content"></textarea>
+      <select id="add-category"></select>
+      <div class="modal-buttons">
+        <span class="text-button" onclick="submitAdd()">Save</span>
+        <span class="text-button" onclick="closeAddModal()">Cancel</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🔐 Login</h2>
+      <input type="text" id="login-username" placeholder="Username">
+      <input type="password" id="login-password" placeholder="Password">
+      <div class="modal-buttons">
+        <span class="text-button" onclick="submitLogin()">Login</span>
+        <span class="text-button" onclick="closeLoginModal()">Cancel</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="logout-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🚪 Logout</h2>
+      <p>Are you sure you want to log out?</p>
+      <div class="modal-buttons">
+        <button onclick="confirmLogout()">Yes, Logout</button>
+        <button onclick="closeLogoutModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="signup-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>📝 Signup</h2>
+      <input type="text" id="signup-username" placeholder="Username">
+      <input type="password" id="signup-password" placeholder="Password">
+      <div class="modal-buttons">
+        <button onclick="submitSignup()">Register</button>
+        <button onclick="closeSignupModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="add-warning-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>⚠️ Login Required</h2>
+      <p>You need to be logged in to add a post.</p>
+      <div class="modal-buttons">
+        <span class="text-button" onclick="submitLogin()">Login</span>
+        <span class="text-button" onclick="closeLoginModal()">Cancel</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="alert-modal" class="modal hidden">
+    <div class="modal-content">
+      <p id="alert-message">You must be logged in to add a post.</p>
+      <div class="modal-buttons">
+        <span class="text-button" onclick="handleAlertLogin()">Login</span>
+        <span class="text-button" onclick="closeAlertModal()">Cancel</span>
+      </div>
+    </div>
+  </div>
+  <script src="/static/main.js"></script>
+
+  <footer>
+    &copy; The Quiet Almanac {{ 2025 }}
+  </footer>
+</body>
+</html>
