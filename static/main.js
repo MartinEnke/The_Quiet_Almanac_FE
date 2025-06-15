@@ -62,6 +62,7 @@ function clearToken() {
    INITIALIZATION
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById("load-posts-btn").addEventListener("click", loadPosts);
   console.log("🚀 DOM fully loaded. Starting app.");
 
   // Base-URL textbox
