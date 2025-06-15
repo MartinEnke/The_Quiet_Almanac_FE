@@ -7,11 +7,29 @@ const API_URL_KEY = 'apiBaseUrl';
 let categories = [];
 let postToEditId = null;
 
+function checkBackendConnection() {
+  fetch(`${getBaseUrl()}/status`)
+    .then(res => {
+      if (res.ok) {
+        console.log("✅ Backend status: OK");
+      } else {
+        throw new Error("Non-200 status");
+      }
+    })
+    .catch(err => {
+      console.error("❌ Backend not reachable:", err);
+      alert("Could not reach the backend. Check API base URL.");
+    });
+}
+
 /* ==========================================================================
    UTILITIES: BASE URL (public v1 API)
    ========================================================================== */
 function getDefaultBaseUrl() {
-  return "https://the-quiet-almanac.onrender.com/api/v2";  // ✅ use your live Render backend URL
+  const isLocal = location.hostname === "127.0.0.1" || location.hostname === "localhost";
+  return isLocal
+    ? "http://127.0.0.1:5000/api/v1"
+    : "https://the-quiet-almanac.onrender.com/api/v1";
 }
 
 function getBaseUrl() {
@@ -44,7 +62,7 @@ function clearToken() {
    INITIALIZATION
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
-  checkBackendConnection(); // Backend Ping Check
+  console.log("🚀 DOM fully loaded. Starting app.");
 
   // Base-URL textbox
   document.getElementById('api-base-url').value = getBaseUrl();
@@ -67,12 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
    POSTS: LOAD / RENDER / SEARCH
    ========================================================================== */
 function loadPosts() {
+  console.log("Calling loadPosts with base URL:", getBaseUrl());
   const base = getBaseUrl();
   const qs = new URLSearchParams({
     category: document.getElementById('filter-category').value,
     sort:     document.getElementById('sort-field').value,
-    direction:document.getElementById('sort-direction').value
+    direction: document.getElementById('sort-direction').value
   });
+
   fetch(`${base}/posts?${qs}`)
     .then(r => r.json())
     .then(data => {
@@ -83,6 +103,7 @@ function loadPosts() {
     })
     .catch(err => console.error('Error loading posts:', err));
 }
+
 
 /**
  * Renders a single post card, showing Edit/Delete only to the author.
@@ -245,21 +266,69 @@ function likePost(id) {
    CATEGORIES
    ========================================================================== */
 function loadCategories() {
-  fetch(`${getBaseUrl()}/categories`)
-    .then(r => r.json())
+  const baseUrl = getBaseUrl();
+  const categoryUrl = baseUrl.replace(/\/api\/v[12]$/, '') + '/api/categories';
+  console.log("🔄 Calling loadCategories with:", categoryUrl);
+
+  const dropdownIds = ['filter-category', 'add-category', 'edit-category'];
+
+  dropdownIds.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) {
+      console.warn(`⚠️ Element #${id} not found in DOM at loadCategories start.`);
+      return;
+    }
+
+    const defaultOption = id === 'filter-category'
+      ? new Option("All Categories", "")
+      : new Option("Select Category", "");
+    sel.innerHTML = '';  // clear everything first
+    sel.appendChild(defaultOption);
+  });
+
+  fetch(categoryUrl)
+    .then(response => {
+      console.log("📡 Category response status:", response.status);
+      if (!response.ok) throw new Error(`Bad response: ${response.status}`);
+      return response.json();
+    })
     .then(fetched => {
-      categories = fetched;
-      ['filter-category','add-category','edit-category'].forEach(id => {
+      console.log("📦 Categories fetched from API:", fetched);
+      // 👇 Insert hardcoded test here
+      categories = ["Test1", "Test2", "Another"];
+      console.log("📦 Categories fetched from API (overridden for test):", categories);
+
+      if (!Array.isArray(categories)) {
+        console.error("❌ Categories response is not an array:", categories);
+        return;
+      }
+
+      dropdownIds.forEach(id => {
         const sel = document.getElementById(id);
-        if (!sel) return;
-        sel.innerHTML = `<option value="">${
-          id==='filter-category'?'All Categories':'Select Category'
-        }</option>`;
-        categories.forEach(cat => sel.appendChild(new Option(cat, cat)));
+        if (!sel) {
+          console.warn(`⚠️ Skipping #${id}, not found during population.`);
+          return;
+        }
+
+        categories.forEach(cat => {
+          if (typeof cat === 'string') {
+            const opt = new Option(cat, cat);
+            sel.appendChild(opt);
+          } else {
+            console.warn(`⚠️ Skipping non-string category:`, cat);
+          }
+        });
+
+        console.log(`✅ Populated #${id} with ${sel.options.length} options.`);
       });
     })
-    .catch(console.error);
+    .catch(err => {
+      console.error("❌ Failed to fetch or populate categories:", err);
+    });
 }
+
+
+
 
 /* ==========================================================================
    AUTH: LOGIN / SIGNUP / UI
